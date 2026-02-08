@@ -1,61 +1,62 @@
-/* eslint-disable no-console */
 import React, { useState } from 'react';
+
 import './App.scss';
 import { GoodsList } from './GoodsList';
-import { get5First, getAll, getRedGoods } from './api/goods';
+import { Good } from './types/Good';
 
-// import { getAll, get5First, getRed } from './api/goods';
-// or
-// import * as goodsAPI from './api/goods';
+import { getAll, get5First, getRedGoods } from './api/goods';
 
 export const App: React.FC = () => {
   const [goods, setGoods] = useState<Good[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const loadAllGoods = () => {
+  function handleLoadAllGoods() {
+    setErrorMessage('');
+
     getAll()
       .then(setGoods)
-      .catch(error => {
-        console.error(error);
-      });
-  };
+      .catch(() => setErrorMessage('Something went wrong!'));
+  }
 
-  const load5FirstGoods = () => {
+  function handleFiveOfFirst() {
+    setErrorMessage('');
+
     get5First()
       .then(setGoods)
-      .catch(error => {
-        console.error(error);
-      });
-  };
+      .catch(() => setErrorMessage('Something went wrong!'));
+  }
 
-  const loadRedGoods = () => {
+  function handleOnlyRed() {
+    setErrorMessage('');
+
     getRedGoods()
       .then(setGoods)
-      .catch(error => {
-        console.error(error);
-      });
-  };
+      .catch(() => setErrorMessage('Something went wrong!'));
+  }
 
   return (
     <div className="App">
       <h1>Dynamic list of Goods</h1>
 
-      <button type="button" data-cy="all-button" onClick={loadAllGoods}>
+      <button type="button" data-cy="all-button" onClick={handleLoadAllGoods}>
         Load all goods
       </button>
 
       <button
         type="button"
         data-cy="first-five-button"
-        onClick={load5FirstGoods}
+        onClick={handleFiveOfFirst}
       >
         Load 5 first goods
       </button>
 
-      <button type="button" data-cy="red-button" onClick={loadRedGoods}>
+      <button type="button" data-cy="red-button" onClick={handleOnlyRed}>
         Load red goods
       </button>
 
-      <GoodsList goods={[goods]} />
+      {errorMessage && <p className="Error">{errorMessage}</p>}
+
+      {!errorMessage && goods.length > 0 && <GoodsList goods={goods} />}
     </div>
   );
 };
